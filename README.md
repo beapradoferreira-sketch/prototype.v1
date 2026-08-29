@@ -62,14 +62,17 @@ app/
     ├── departamentos/[slug]/ os quatro departamentos
     ├── lancamentos/          Tela 06 — auto-lançamento (Fase 2, desligado)
     ├── agentes/              Tela 08 — agentes (Fase 3, desligado)
-    ├── portal/               portal do cliente (Fase 3, desligado)
+    ├── portal/               régua do escritório sobre o portal (Fase 3)
     ├── spec/                 as decisões, legíveis dentro do app
     └── admin/                o nível Diretoria — 8 telas
+(cliente)/
+└── area-do-cliente/[clientId]/   o que o CLIENTE vê — chrome próprio (Fase 3)
 lib/
 ├── types.ts                  o modelo de entidades que faltava
 ├── data.ts                   dados de exemplo + acessores (trocar por banco)
 ├── cnpj.ts                   validação de CNPJ nos dois formatos
 ├── labels.ts                 todo rótulo visível, em pt-BR
+├── portal.ts                 recorte do que o cliente pode ver
 └── access.ts                 escopo por papel e mascaramento LGPD
 docs/DECISOES.md              cada questão em aberto, e o que foi decidido
 ```
@@ -94,6 +97,18 @@ expurgo por cliente necessariamente apagaria ou reteria algo ilegalmente.
 **CNPJ aceita os dois formatos** desde o primeiro schema. O `lib/cnpj.ts`
 implementa o mod-11 com valor de caractere = ASCII − 48, conferido contra o
 exemplo oficial da Receita (`12ABC34501DE` → dígitos `35`).
+
+**Duas visões distintas, não uma tela com menos coisa.** `/clientes/[id]` é o
+escritório olhando o cliente; `/area-do-cliente/[clientId]` é o cliente olhando
+a si mesmo, com chrome próprio para a fronteira ser óbvia. O recorte vive em
+`lib/portal.ts`, não na interface: o cliente nunca vê outro cliente, nome de
+quem executa a tarefa, nem conteúdo de documento sensível. Abra pelo `/portal`,
+em "Ver como o cliente".
+
+**As telas internas recortam por cliente pela URL.** `?cliente=c1` funciona em
+`/dashboard`, `/status` e `/departamentos/[slug]`, então "olha a Prado Metais no
+Fiscal" vira um link que a outra pessoa abre na mesma tela. Um id inválido volta
+para a visão completa em vez de filtrar para o vazio.
 
 **Fases 2 e 3 chegam desligadas.** Auto-lançamento, portal do cliente e o
 ambiente de agentes estão construídos, mas desativados, e são ligados em

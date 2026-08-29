@@ -10,13 +10,14 @@
  */
 
 import Link from "next/link";
-import { use, useState } from "react";
+import { Suspense, use, useState } from "react";
 import { useSession } from "@/components/session";
 import {
   Badge, Callout, Card, PageHeader, Progress, SectionTitle, StatusBadge,
   Table, Td, shortDate,
 } from "@/components/ui";
 import { canAccessDepartment } from "@/lib/access";
+import { ClientFilter, ClientFilterBanner, useClientFilter } from "@/components/client-filter";
 import {
   COMPETENCIAS, COMPETENCIA_ATUAL, departmentProgress,
   getClient, getDepartment, getUser, tasksFor,
@@ -33,10 +34,20 @@ const FILTERS: { key: TaskStatus | "todas"; label: string }[] = [
 ];
 
 export default function DepartamentoPage({ params }: { params: Promise<{ slug: string }> }) {
+  // useSearchParams exige fronteira de Suspense em rota pré-renderizada.
+  return (
+    <Suspense fallback={null}>
+      <DepartamentoConteudo params={params} />
+    </Suspense>
+  );
+}
+
+function DepartamentoConteudo({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
   const { viewer } = useSession();
   const [compId, setCompId] = useState(COMPETENCIA_ATUAL);
   const [filtro, setFiltro] = useState<TaskStatus | "todas">("todas");
+  const { clienteId } = useClientFilter();
 
   const dept = getDepartment(slug);
   if (!dept) {
@@ -65,14 +76,21 @@ export default function DepartamentoPage({ params }: { params: Promise<{ slug: s
     );
   }
 
-  const all = tasksFor({ competenciaId: compId, departamento: dept.slug });
+  const all = tasksFor({
+    competenciaId: compId,
+    departamento: dept.slug,
+    clientId: clienteId || undefined,
+  });
   const tasks = filtro === "todas" ? all : all.filter((t) => t.status === filtro);
-  const progress = departmentProgress(compId).find((p) => p.slug === dept.slug)!;
+  const progress = departmentProgress(compId, clienteId || undefined).find(
+    (p) => p.slug === dept.slug,
+  )!;
 
   // Preparo do que vem acima — a cadeia é sequencial e travada por documento.
+  const upstreamProgress = departmentProgress(compId, clienteId || undefined);
   const upstream = dept.dependeDe.map((s) => ({
     dept: getDepartment(s)!,
-    progress: departmentProgress(compId).find((p) => p.slug === s)!,
+    progress: upstreamProgress.find((p) => p.slug === s)!,
   }));
 
   return (
@@ -81,22 +99,27 @@ export default function DepartamentoPage({ params }: { params: Promise<{ slug: s
         title={dept.nome}
         note={dept.descricao}
         actions={
-          <label className="flex items-center gap-2">
-            <span className="font-mono text-[10.5px] uppercase tracking-wider text-ink-3">
-              Competência
-            </span>
-            <select
-              value={compId}
-              onChange={(e) => setCompId(e.target.value)}
-              className="rounded-lg border border-line bg-surface px-2 py-1.5 text-[13px] text-ink"
-            >
-              {COMPETENCIAS.map((c) => (
-                <option key={c.id} value={c.id}>{c.label}</option>
-              ))}
-            </select>
-          </label>
+          <>
+            <ClientFilter />
+            <label className="flex items-center gap-2">
+              <span className="font-mono text-[10.5px] uppercase tracking-wider text-ink-3">
+                Competência
+              </span>
+              <select
+                value={compId}
+                onChange={(e) => setCompId(e.target.value)}
+                className="rounded-lg border border-line bg-surface px-2 py-1.5 text-[13px] text-ink"
+              >
+                {COMPETENCIAS.map((c) => (
+                  <option key={c.id} value={c.id}>{c.label}</option>
+                ))}
+              </select>
+            </label>
+          </>
         }
       />
+
+      <ClientFilterBanner />
 
       <div className="mb-6 grid gap-3 sm:grid-cols-4">
         <Card className="p-4">

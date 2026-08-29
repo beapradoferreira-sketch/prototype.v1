@@ -9,9 +9,12 @@
  */
 
 import Link from "next/link";
+import { Suspense } from "react";
 import { useSession } from "@/components/session";
 import { Card, Progress, SectionTitle, Stat, StatusBadge, currency } from "@/components/ui";
 import { canAccessAdmin, visibleDepartments } from "@/lib/access";
+import { REGIME_LABEL } from "@/lib/labels";
+import { ClientFilter, ClientFilterBanner, useClientFilter } from "@/components/client-filter";
 import {
   COMPETENCIA_ATUAL,
   DEPARTMENTS,
@@ -23,50 +26,106 @@ import {
 } from "@/lib/data";
 
 export default function DashboardPage() {
+  // useSearchParams exige fronteira de Suspense em rota pré-renderizada.
+  return (
+    <Suspense fallback={null}>
+      <DashboardConteudo />
+    </Suspense>
+  );
+}
+
+function DashboardConteudo() {
   const { viewer } = useSession();
+  const { clienteId, cliente } = useClientFilter();
   const depts = visibleDepartments(viewer);
   const isExecutor = viewer.role === "executor";
 
-  const metrics = firmMetrics(COMPETENCIA_ATUAL);
-  const progress = departmentProgress(COMPETENCIA_ATUAL).filter((p) =>
+  const firm = firmMetrics(COMPETENCIA_ATUAL);
+  const progress = departmentProgress(COMPETENCIA_ATUAL, clienteId || undefined).filter((p) =>
     depts.includes(p.slug as never),
   );
   const minhasTarefas = tasksFor({
     competenciaId: COMPETENCIA_ATUAL,
     assigneeId: viewer.user.id,
+    clientId: clienteId || undefined,
   }).filter((t) => t.status !== "concluida");
 
-  const bloqueios = bloqueiosPorCliente(COMPETENCIA_ATUAL).filter(
-    (b) => b.bloqueadas + b.atrasadas > 0,
-  );
+  // Com um cliente selecionado os cartões passam a falar dele, não do
+  // escritório — somar faturamento de um cliente só seria um número sem uso.
+  const escopo = tasksFor({ competenciaId: COMPETENCIA_ATUAL, clientId: clienteId || undefined });
+  const metrics = clienteId
+    ? {
+        ...firm,
+        tarefasTotal: escopo.length,
+        tarefasConcluidas: escopo.filter((t) => t.status === "concluida").length,
+        pctConcluido: escopo.length
+          ? Math.round((escopo.filter((t) => t.status === "concluida").length / escopo.length) * 100)
+          : 0,
+        atrasadas: escopo.filter((t) => t.status === "atrasada").length,
+        aguardandoCliente: escopo.filter((t) => t.status === "aguardando-cliente").length,
+      }
+    : firm;
+
+  const bloqueios = bloqueiosPorCliente(COMPETENCIA_ATUAL)
+    .filter((b) => b.bloqueadas + b.atrasadas > 0)
+    .filter((b) => !clienteId || b.client.id === clienteId);
 
   return (
     <>
-      <div className="mb-7">
-        <h1 className="font-display text-2xl font-extrabold tracking-tight text-ink">
-          Olá, {viewer.user.nome.split(" ")[0]}
-        </h1>
-        <p className="mt-1 text-sm text-ink-3">
-          {isExecutor
-            ? "Suas tarefas e o andamento do seu departamento nesta competência."
-            : "Visão do escritório na competência aberta."}
-        </p>
+      <div className="mb-7 flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="font-display text-2xl font-extrabold tracking-tight text-ink">
+            Olá, {viewer.user.nome.split(" ")[0]}
+          </h1>
+          <p className="mt-1 text-sm text-ink-3">
+            {cliente
+              ? `Andamento de ${cliente.nomeFantasia} na competência aberta.`
+              : isExecutor
+                ? "Suas tarefas e o andamento do seu departamento nesta competência."
+                : "Visão do escritório na competência aberta."}
+          </p>
+        </div>
+        <ClientFilter />
       </div>
+
+      <ClientFilterBanner />
 
       {/* Executor não vê financeiro do escritório — a regra da Tela 03. */}
       {!isExecutor && (
         <div className="mb-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Stat
-            label="Faturamento mensal"
-            value={currency(metrics.faturamentoMensal)}
-            sub={`Ticket médio ${currency(metrics.ticketMedio)}`}
-          />
-          <Stat
-            label="Clientes ativos"
-            value={String(metrics.clientesAtivos)}
-            sub={`${metrics.clientesEncerrados} encerrado(s)`}
-          />
-          <Stat label="Funcionários" value={String(metrics.funcionarios)} sub="Equipe ativa" />
+          {cliente ? (
+            <>
+              <Stat
+                label="Honorário do cliente"
+                value={currency(cliente.honorarioMensal)}
+                sub={cliente.grupo ?? "Sem grupo"}
+              />
+              <Stat
+                label="Regime"
+                value={REGIME_LABEL[cliente.regime]}
+                sub={cliente.segmento}
+              />
+              <Stat
+                label="Tarefas no mês"
+                value={String(metrics.tarefasTotal)}
+                sub={`${metrics.tarefasConcluidas} concluídas`}
+              />
+            </>
+          ) : (
+            <>
+              <Stat
+                label="Faturamento mensal"
+                value={currency(metrics.faturamentoMensal)}
+                sub={`Ticket médio ${currency(metrics.ticketMedio)}`}
+              />
+              <Stat
+                label="Clientes ativos"
+                value={String(metrics.clientesAtivos)}
+                sub={`${metrics.clientesEncerrados} encerrado(s)`}
+              />
+              <Stat label="Funcionários" value={String(metrics.funcionarios)} sub="Equipe ativa" />
+            </>
+          )}
           <Stat
             label="Competência concluída"
             value={`${metrics.pctConcluido}%`}

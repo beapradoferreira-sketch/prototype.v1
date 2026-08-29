@@ -30,7 +30,7 @@ import {
 
 export default function ClientePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { viewer } = useSession();
+  const { viewer, modules } = useSession();
   const client = getClient(id);
 
   if (!client) {
@@ -54,7 +54,27 @@ export default function ClientePage({ params }: { params: Promise<{ id: string }
       <PageHeader
         title={client.nomeFantasia}
         note={`${client.razaoSocial}${client.grupo ? ` · ${client.grupo}` : ""} · cliente desde ${shortDate(client.desde)}`}
-        actions={<Link href="/clientes" className="text-sm text-navy-ink underline underline-offset-2">Todos os clientes</Link>}
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href={`/dashboard?cliente=${client.id}`}
+              className="rounded-lg border border-line bg-surface-2 px-2.5 py-1.5 text-[12.5px] font-semibold text-navy-ink hover:border-navy"
+            >
+              Ver no painel
+            </Link>
+            {modules["portal-cliente"] && (
+              <Link
+                href={`/area-do-cliente/${client.id}`}
+                className="rounded-lg border border-line bg-surface-2 px-2.5 py-1.5 text-[12.5px] font-semibold text-navy-ink hover:border-navy"
+              >
+                Ver como o cliente
+              </Link>
+            )}
+            <Link href="/clientes" className="text-sm text-navy-ink underline underline-offset-2">
+              Todos os clientes
+            </Link>
+          </div>
+        }
       />
 
       <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

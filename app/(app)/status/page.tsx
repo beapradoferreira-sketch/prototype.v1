@@ -9,10 +9,11 @@
  */
 
 import Link from "next/link";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useSession } from "@/components/session";
 import { Card, PageHeader, Progress, Badge } from "@/components/ui";
 import { visibleDepartments } from "@/lib/access";
+import { ClientFilter, ClientFilterBanner, useClientFilter } from "@/components/client-filter";
 import {
   CLIENTS,
   COMPETENCIAS,
@@ -32,12 +33,24 @@ function cellTone(pct: number, atrasadas: number, aguardando: number) {
 }
 
 export default function StatusPage() {
+  // useSearchParams exige fronteira de Suspense em rota pré-renderizada.
+  return (
+    <Suspense fallback={null}>
+      <StatusConteudo />
+    </Suspense>
+  );
+}
+
+function StatusConteudo() {
   const { viewer } = useSession();
   const [compId, setCompId] = useState(COMPETENCIA_ATUAL);
+  const { clienteId } = useClientFilter();
   const depts = DEPARTMENTS.filter((d) => visibleDepartments(viewer).includes(d.slug));
   const comp = getCompetencia(compId)!;
-  const ativos = CLIENTS.filter((c) => c.ativo);
-  const totals = departmentProgress(compId).filter((p) => depts.some((d) => d.slug === p.slug));
+  const ativos = CLIENTS.filter((c) => c.ativo && (!clienteId || c.id === clienteId));
+  const totals = departmentProgress(compId, clienteId || undefined).filter((p) =>
+    depts.some((d) => d.slug === p.slug),
+  );
 
   return (
     <>
@@ -45,25 +58,30 @@ export default function StatusPage() {
         title="Central de status"
         note="Onde cada cliente está travado, por departamento e competência. A cadeia é sequencial: sem documento, o fiscal não lança, o pessoal não processa e a contabilidade não escritura."
         actions={
-          <label className="flex items-center gap-2">
-            <span className="font-mono text-[10.5px] uppercase tracking-wider text-ink-3">
-              Competência
-            </span>
-            <select
-              value={compId}
-              onChange={(e) => setCompId(e.target.value)}
-              className="rounded-lg border border-line bg-surface px-2 py-1.5 text-[13px] text-ink"
-            >
-              {COMPETENCIAS.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.label}
-                  {c.encerrada ? " (encerrada)" : ""}
-                </option>
-              ))}
-            </select>
-          </label>
+          <>
+            <ClientFilter />
+            <label className="flex items-center gap-2">
+              <span className="font-mono text-[10.5px] uppercase tracking-wider text-ink-3">
+                Competência
+              </span>
+              <select
+                value={compId}
+                onChange={(e) => setCompId(e.target.value)}
+                className="rounded-lg border border-line bg-surface px-2 py-1.5 text-[13px] text-ink"
+              >
+                {COMPETENCIAS.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.label}
+                    {c.encerrada ? " (encerrada)" : ""}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </>
         }
       />
+
+      <ClientFilterBanner />
 
       {comp.encerrada && (
         <div className="mb-5">

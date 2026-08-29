@@ -89,6 +89,8 @@ export default function SpecPage() {
         <tr><Td>07 Camada de API governamental</Td><Td>/admin/integracoes, /admin/procuracoes</Td><Td><Badge tone="green">modelada</Badge></Td></tr>
         <tr><Td>08 Agentes automatizados</Td><Td>/agentes</Td><Td><Badge tone="gold">Fase 3, desligado</Badge></Td></tr>
         <tr><Td>Painel administrativo (adicionado)</Td><Td>/admin</Td><Td><Badge tone="green">construída</Badge></Td></tr>
+        <tr><Td>Área do cliente (adicionada)</Td><Td>/area-do-cliente/[id]</Td><Td><Badge tone="gold">Fase 3, desligado</Badge></Td></tr>
+        <tr><Td>Recorte por cliente (adicionado)</Td><Td>?cliente= em painel, status e departamentos</Td><Td><Badge tone="green">construída</Badge></Td></tr>
       </Table>
     </>
   );
