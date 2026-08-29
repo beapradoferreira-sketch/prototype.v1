@@ -1,11 +1,11 @@
 "use client";
 
-/* Screen 05 — Central status hub.
+/* Tela 05 — Central de status.
  *
- * The brief ranks this as the single highest-leverage thing to build: cheapest
- * to write, attacks the most-cited pain point (nobody knows where a client is
- * stuck), and depends on no external API. It is the client x department matrix
- * for a competência, so a manager can see the whole month in one grid.
+ * A especificação coloca esta como a coisa de maior alavancagem a construir: a
+ * mais barata de escrever, ataca a dor mais citada (ninguém sabe onde o cliente
+ * travou) e não depende de API externa. É a matriz cliente × departamento da
+ * competência, para o gestor ver o mês inteiro numa grade só.
  */
 
 import Link from "next/link";
@@ -22,6 +22,7 @@ import {
   getCompetencia,
   tasksFor,
 } from "@/lib/data";
+import { REGIME_LABEL } from "@/lib/labels";
 
 function cellTone(pct: number, atrasadas: number, aguardando: number) {
   if (atrasadas > 0) return "bg-red-soft text-red border-red/30";
@@ -121,7 +122,7 @@ export default function StatusPage() {
                     >
                       {c.nomeFantasia}
                     </Link>
-                    <p className="mt-0.5 text-[11px] text-ink-3">{c.regime.replace("-", " ")}</p>
+                    <p className="mt-0.5 text-[11px] text-ink-3">{REGIME_LABEL[c.regime]}</p>
                   </td>
                   {depts.map((d) => {
                     const ts = tasksFor({

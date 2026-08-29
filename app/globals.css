@@ -1,12 +1,13 @@
 @import "tailwindcss";
 
-/* Dark mode is driven by an explicit attribute on <html>, set before first
-   paint by an inline script. Default resolves from the OS. */
+/* O tema escuro é acionado por um atributo explícito no <html>, definido antes
+   da primeira pintura por um script inline. O padrão vem do sistema. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
-/* Palette: the brief's "classic & sober" direction — navy as the trust anchor,
-   green reserved strictly for confirmation states, red meaning exactly one
-   thing (missed prazo / failed integration), gold as a sparing accent. */
+/* Paleta: a direção "clássica e sóbria" da especificação — azul-marinho como
+   âncora de confiança, verde reservado estritamente a estados de confirmação,
+   vermelho significando exatamente uma coisa (prazo perdido / integração com
+   falha) e dourado como acento parcimonioso. */
 :root {
   --bg: #f6f7f8;
   --surface: #ffffff;
@@ -90,14 +91,14 @@ body {
   background: var(--green-soft);
 }
 
-/* Focus ring — visible on every interactive element, both themes. */
+/* Anel de foco — visível em todo elemento interativo, nos dois temas. */
 :focus-visible {
   outline: 2px solid var(--navy);
   outline-offset: 2px;
   border-radius: 4px;
 }
 
-/* Thin scrollbars inside scroll regions so wide tables don't look broken. */
+/* Barras de rolagem finas nas áreas roláveis, para tabelas largas não parecerem quebradas. */
 .scroll-x {
   overflow-x: auto;
   scrollbar-width: thin;

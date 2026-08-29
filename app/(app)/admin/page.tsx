@@ -1,10 +1,11 @@
 "use client";
 
-/* Admin 08 — System health + overview. */
+/* Admin 08 — Saúde do sistema e visão geral. */
 
 import Link from "next/link";
 import { Badge, Card, PageHeader, SectionTitle, Stat, dateTime } from "@/components/ui";
 import { CLIENTS, DSARS, FLAGS, INTEGRATIONS, PROCURACOES, USERS } from "@/lib/data";
+import { INTEGRACAO_STATUS_LABEL, SEVERIDADE_LABEL } from "@/lib/labels";
 
 const STATUS_TONE = {
   conectada: "green",
@@ -47,7 +48,7 @@ export default function AdminHome() {
         />
       </div>
 
-      <SectionTitle note="Status das dependências externas — o limite de confiança do sistema">
+      <SectionTitle note="Situação das dependências externas — o limite de confiança do sistema">
         Saúde do sistema
       </SectionTitle>
       <Card className="mb-7 divide-y divide-line">
@@ -59,9 +60,11 @@ export default function AdminHome() {
             </div>
             <div className="flex shrink-0 items-center gap-3">
               <span className="font-mono text-[11px] text-ink-3">
-                {i.ultimoSync ? `sync ${dateTime(i.ultimoSync)}` : "nunca sincronizou"}
+                {i.ultimoSync
+                  ? `sincronizado ${dateTime(i.ultimoSync)}`
+                  : "nunca sincronizou"}
               </span>
-              <Badge tone={STATUS_TONE[i.status]}>{i.status.replace("-", " ")}</Badge>
+              <Badge tone={STATUS_TONE[i.status]}>{INTEGRACAO_STATUS_LABEL[i.status]}</Badge>
             </div>
           </div>
         ))}
@@ -74,7 +77,7 @@ export default function AdminHome() {
             {altas.map((f) => (
               <div key={f.id} className="p-4">
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge tone="red">{f.severidade}</Badge>
+                  <Badge tone="red">{SEVERIDADE_LABEL[f.severidade]}</Badge>
                   {f.escalarParaEncarregado && <Badge tone="navy">encarregado</Badge>}
                   <span className="ml-auto font-mono text-[11px] text-ink-3">{dateTime(f.em)}</span>
                 </div>

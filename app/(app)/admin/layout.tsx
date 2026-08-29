@@ -1,10 +1,11 @@
 "use client";
 
-/* Admin — the Owner tier, above manager/executor.
+/* Admin — o nível Diretoria, acima de gestor/executor.
  *
- * The brief is explicit that this is a different surface from the dashboard:
- * configuring integrations, who has access to what, and what the agents flagged
- * overnight is not the same job as seeing who is behind this competência.
+ * A especificação é explícita: esta é uma superfície diferente do painel.
+ * Configurar integrações, definir quem acessa o quê e ver o que os agentes
+ * sinalizaram de madrugada não é o mesmo trabalho que acompanhar quem está
+ * atrasado na competência.
  */
 
 import Link from "next/link";

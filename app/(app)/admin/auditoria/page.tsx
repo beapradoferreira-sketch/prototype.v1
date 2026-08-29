@@ -1,14 +1,15 @@
 "use client";
 
-/* Admin 05 — Audit log.
+/* Admin 05 — Log de auditoria.
  *
- * Reads of sensitive fields are logged, not just writes. This is both the LGPD
- * evidence trail and what the sensitive-field auditor agent reads from.
+ * Leitura de campo sensível vai para o log, não só escrita. É ao mesmo tempo a
+ * trilha de evidência da LGPD e a fonte do agente auditor de campos sensíveis.
  */
 
 import { useState } from "react";
 import { Badge, Card, PageHeader, Table, Td, dateTime } from "@/components/ui";
 import { AUDIT, getUser } from "@/lib/data";
+import { ACAO_LABEL } from "@/lib/labels";
 
 export default function AuditoriaPage() {
   const [somenteSensiveis, setSomenteSensiveis] = useState(false);
@@ -59,7 +60,7 @@ export default function AuditoriaPage() {
               {dateTime(a.em)}
             </Td>
             <Td className="text-ink">{getUser(a.userId)?.nome}</Td>
-            <Td className="capitalize">{a.acao.replace("-", " ")}</Td>
+            <Td>{ACAO_LABEL[a.acao]}</Td>
             <Td className="font-mono text-[11.5px]">
               {a.entidade} {a.entidadeId}
             </Td>

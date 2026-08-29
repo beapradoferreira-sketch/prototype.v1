@@ -1,13 +1,14 @@
-/* Access rules and LGPD masking.
+/* Regras de acesso e mascaramento LGPD.
  *
- * The brief's rule: an executor in Fiscal has no legitimate reason to see a
- * colleague's atestado médico surfaced through DP. Sensitive fields are masked
- * unless the viewing role's department owns the data, and every view or export
- * of a sensitive field is logged — reads, not just writes.
+ * A regra da especificação: um executor do Fiscal não tem motivo legítimo para
+ * ver o atestado médico de um colega que aparece pelo DP. Campos sensíveis são
+ * mascarados a menos que o departamento de quem está vendo seja o dono do dado,
+ * e toda visualização ou exportação de campo sensível vai para o log — leituras,
+ * não apenas escritas.
  *
- * In the prototype the "session" comes from the role switcher rather than auth,
- * but every screen goes through these helpers, so wiring real sessions later
- * means changing where `viewer` comes from and nothing else.
+ * No protótipo a "sessão" vem do seletor de papel, e não de autenticação, mas
+ * toda tela passa por estes helpers: ligar sessões reais depois significa mudar
+ * de onde vem o `viewer`, e nada além disso.
  */
 
 import type { DepartmentSlug, Document, Role, User } from "./types";
@@ -18,7 +19,7 @@ export interface Viewer {
   departamentos: DepartmentSlug[];
 }
 
-/** Owners and managers see across; executors are scoped to their department. */
+/** Diretoria e gestor enxergam de forma transversal; executor fica no seu departamento. */
 export function canSeeAllDepartments(role: Role): boolean {
   return role === "owner" || role === "manager";
 }
@@ -32,7 +33,7 @@ export function canAccessDepartment(viewer: Viewer, slug: DepartmentSlug): boole
   return visibleDepartments(viewer).includes(slug);
 }
 
-/** Admin is a fourth tier above manager/executor — the owners' surface. */
+/** O Admin é um quarto nível acima de gestor/executor — a superfície da diretoria. */
 export function canAccessAdmin(viewer: Viewer): boolean {
   return viewer.role === "owner";
 }
@@ -42,9 +43,9 @@ export function canExportBulk(viewer: Viewer): boolean {
 }
 
 /**
- * Whether a sensitive document is readable by this viewer.
- * Non-sensitive documents are readable by anyone in the firm; sensitive ones
- * only by the department that owns them (plus owners, who carry the DPO role).
+ * Se um documento sensível pode ser lido por quem está vendo.
+ * Documento não sensível é legível por qualquer pessoa do escritório; sensível,
+ * só pelo departamento dono (e pela diretoria, que acumula o papel de DPO).
  */
 export function canReadDocument(viewer: Viewer, doc: Document): boolean {
   if (!doc.sensivel) return true;
@@ -54,7 +55,7 @@ export function canReadDocument(viewer: Viewer, doc: Document): boolean {
 
 export interface MaskedDocument extends Document {
   masked: boolean;
-  /** Shown in place of the name when masked, so the row still exists. */
+  /** Exibido no lugar do nome quando mascarado, para a linha continuar existindo. */
   displayName: string;
 }
 
@@ -64,8 +65,8 @@ export function maskDocuments(viewer: Viewer, docs: Document[]): MaskedDocument[
     return {
       ...d,
       masked: !allowed,
-      // The record's existence is not hidden — only its content. Hiding the row
-      // entirely would make the file look incomplete to whoever is working it.
+      // A existência do registro não é escondida — só o conteúdo. Ocultar a
+      // linha inteira faria o arquivo parecer incompleto para quem o trabalha.
       displayName: allowed ? d.nome : "Documento sensível — restrito ao departamento",
     };
   });

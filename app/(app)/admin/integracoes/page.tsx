@@ -1,22 +1,18 @@
 "use client";
 
-/* Admin 02 — Integrations & credentials.
+/* Admin 02 — Integrações e credenciais.
  *
- * The human side of the credential-hygiene and vendor-integrity agents: they
- * watch, you act here. Direction is shown per integration because it is the
- * detail that most often gets assumed wrong — Domínio's public API only
- * accepts pushes, it does not let you read the ledger back out.
+ * O lado humano dos agentes de higiene de credencial e integridade de
+ * fornecedor: eles observam, você age aqui. A direção aparece por integração
+ * porque é o detalhe mais frequentemente presumido errado — a API pública do
+ * Domínio só aceita entrada, não devolve o razão para leitura.
  */
 
 import { Badge, Callout, Card, PageHeader, SectionTitle, dateTime, shortDate } from "@/components/ui";
 import { INTEGRATIONS } from "@/lib/data";
+import { DIRECAO_LABEL, INTEGRACAO_STATUS_LABEL } from "@/lib/labels";
 
 const TONE = { conectada: "green", atencao: "gold", erro: "red", "nao-configurada": "neutral" } as const;
-const DIRECAO_LABEL = {
-  entrada: "entrada — lemos deles",
-  saida: "saída — empurramos para eles",
-  bidirecional: "bidirecional",
-} as const;
 
 function diasAte(iso: string | null): number | null {
   if (!iso) return null;
@@ -30,7 +26,7 @@ export default function IntegracoesPage() {
     <>
       <PageHeader
         title="Integrações e credenciais"
-        note="Status, validade de certificado, último sync e rotação. Um painel por dependência externa."
+        note="Situação, validade de certificado, última sincronização e rotação. Um painel por dependência externa."
       />
 
       <div className="mb-6">
@@ -52,7 +48,7 @@ export default function IntegracoesPage() {
             <Card key={i.id} className="p-5">
               <div className="flex items-start justify-between gap-3">
                 <p className="font-display text-[15px] font-bold text-ink">{i.nome}</p>
-                <Badge tone={TONE[i.status]}>{i.status.replace("-", " ")}</Badge>
+                <Badge tone={TONE[i.status]}>{INTEGRACAO_STATUS_LABEL[i.status]}</Badge>
               </div>
               <p className="mt-1.5 text-[13px] text-ink-2">{i.descricao}</p>
 
@@ -62,7 +58,7 @@ export default function IntegracoesPage() {
                   <dd className="text-right text-ink-2">{DIRECAO_LABEL[i.direcao]}</dd>
                 </div>
                 <div className="flex justify-between gap-3">
-                  <dt>último sync</dt>
+                  <dt>última sincronização</dt>
                   <dd className="text-right text-ink-2">
                     {i.ultimoSync ? dateTime(i.ultimoSync) : "nunca"}
                   </dd>

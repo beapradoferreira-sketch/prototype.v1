@@ -1,8 +1,9 @@
 "use client";
 
-/* Specification — the brief this prototype was built from, and what was decided
- * about the questions it left open. Kept inside the app so the reasoning
- * travels with the code rather than living in a document nobody reopens. */
+/* Especificação — o documento de que este protótipo nasceu, e o que foi
+ * decidido sobre as questões deixadas em aberto. Mantido dentro do app para o
+ * raciocínio viajar junto do código, em vez de morar num documento que ninguém
+ * reabre. */
 
 import { Badge, Callout, Card, PageHeader, SectionTitle, Table, Td } from "@/components/ui";
 

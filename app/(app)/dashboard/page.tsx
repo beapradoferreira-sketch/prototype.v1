@@ -1,11 +1,11 @@
 "use client";
 
-/* Screen 02 — Firm dashboard.
+/* Tela 02 — Painel do escritório.
  *
- * Cards for faturamento, índices, funcionários and per-department competency
- * status, per the draft. Screen 03 (hierarchical views) is not a separate
- * route: it is this screen rendering less for an executor, which is what the
- * draft actually describes.
+ * Cartões de faturamento, índices, funcionários e status por departamento na
+ * competência, conforme o rascunho. A Tela 03 (visões hierárquicas) não é rota
+ * separada: é esta tela renderizando menos para um executor, que é exatamente
+ * o que o rascunho descreve.
  */
 
 import Link from "next/link";
@@ -53,7 +53,7 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      {/* Executors do not see firm-level financials — screen 03's rule. */}
+      {/* Executor não vê financeiro do escritório — a regra da Tela 03. */}
       {!isExecutor && (
         <div className="mb-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Stat
@@ -76,7 +76,7 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* The two numbers that actually predict a missed prazo. */}
+      {/* Os dois números que de fato antecipam um prazo perdido. */}
       <div className="mb-7 grid gap-3 sm:grid-cols-2">
         <Stat
           label="Aguardando cliente"

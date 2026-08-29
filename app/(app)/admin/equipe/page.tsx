@@ -1,7 +1,8 @@
 "use client";
 
-/* Admin 01 — Team & roles. Offboarding is the gap the access-anomaly agent
- * exists to catch, so deactivation is the primary action, not an edit form. */
+/* Admin 01 — Equipe e papéis. O desligamento é a brecha que o agente de acesso
+ * anômalo existe para pegar, então desativar é a ação principal — não um
+ * formulário de edição. */
 
 import { Badge, Callout, PageHeader, Table, Td, dateTime } from "@/components/ui";
 import { ROLE_LABEL } from "@/lib/access";

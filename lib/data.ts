@@ -1,12 +1,12 @@
-/* Seed dataset for the prototype.
+/* Dados de exemplo do protótipo.
  *
- * Invented data for a fictional firm. No real client, CPF or bank account
- * appears here. CNPJs are checksum-valid so the validator is genuinely
- * exercised — both the legacy numeric format and the alphanumeric format that
- * went live in July 2026.
+ * Dados inventados de um escritório fictício. Nenhum cliente, CPF ou conta
+ * bancária real aparece aqui. Os CNPJs têm dígito verificador válido para que o
+ * validador seja de fato exercitado — tanto o formato numérico clássico quanto
+ * o alfanumérico que entrou em vigor em julho de 2026.
  *
- * Replacing this file with database queries is the main Phase 1 task; every
- * screen reads through the accessor functions at the bottom, not the arrays.
+ * Trocar este arquivo por consultas a banco é a principal tarefa da Fase 1;
+ * toda tela lê pelas funções de acesso no fim do arquivo, nunca pelos arrays.
  */
 
 import type {
@@ -21,7 +21,7 @@ export const FIRM: Firm = {
   encarregadoId: "u1",
 };
 
-/** The chain is sequential and document-gated: nothing moves without documents. */
+/** A cadeia é sequencial e travada por documento: nada anda sem documento. */
 export const DEPARTMENTS: Department[] = [
   {
     slug: "fiscal",
@@ -145,15 +145,15 @@ export const CLIENTS: Client[] = [
 ];
 
 /* ---------------------------------------------------------------------------
- * Tasks
+ * Tarefas
  *
- * Generated deterministically rather than hand-written: the volume needs to be
- * realistic (8 clients x 4 departments x 3 competências) for the status hub to
- * mean anything, and a seeded generator keeps server and client renders
- * identical. A real backend replaces this with rows.
+ * Geradas de forma determinística em vez de escritas à mão: o volume precisa
+ * ser realista (8 clientes x 4 departamentos x 3 competências) para a central
+ * de status significar alguma coisa, e um gerador com semente mantém o render
+ * do servidor e do cliente idênticos. Um backend real troca isso por linhas.
  * ------------------------------------------------------------------------- */
 
-/** Deterministic PRNG — same sequence every render, so no hydration mismatch. */
+/** PRNG determinístico — mesma sequência a cada render, sem divergência de hidratação. */
 function seeded(seed: number) {
   let s = seed;
   return () => {
@@ -209,7 +209,7 @@ function buildTasks(): Task[] {
           } else if (r < 0.34) {
             status = "concluida";
           } else if (r < 0.52) {
-            // Client-side document delay — the most cited bottleneck.
+            // Atraso de documento do lado do cliente — o gargalo mais citado.
             status = "aguardando-cliente";
             bloqueada = dept.slug === "pessoal" ? "Folha de ponto do mês" : "Extrato bancário do mês";
           } else if (r < 0.68) {
@@ -222,8 +222,8 @@ function buildTasks(): Task[] {
             status = "pendente";
           }
 
-          // Contábil cannot finish before fiscal and pessoal have — the chain
-          // is real, so don't generate states that violate it.
+          // O Contábil não fecha antes de fiscal e pessoal — a cadeia é real,
+          // então não geramos estados que a violem.
           if (dept.slug === "contabil" && !comp.encerrada && status === "concluida" && r > 0.2) {
             status = "em-andamento";
           }
@@ -252,7 +252,7 @@ function buildTasks(): Task[] {
 export const TASKS: Task[] = buildTasks();
 
 /* ---------------------------------------------------------------------------
- * Documents — note the per-document retention class, never per client.
+ * Documentos — repare na classe de retenção por documento, nunca por cliente.
  * ------------------------------------------------------------------------- */
 
 export const DOCUMENTS: Document[] = [
@@ -272,7 +272,7 @@ export const DOCUMENTS: Document[] = [
   { id: "d14", firmId: "f1", clientId: "c7", competenciaId: "2026-08", nome: "Notas de serviço — ago/2026", tipo: "nfe", departamento: "fiscal", recebidoEm: "2026-08-16", solicitadoEm: "2026-08-10", canalSolicitacao: "whatsapp", retention: "fiscal-5a", sensivel: false },
 ];
 
-/** SERPRO acts per client only with that client's electronic power of attorney. */
+/** O SERPRO só age por cliente com a procuração eletrônica daquele cliente. */
 export const PROCURACOES: Procuracao[] = [
   { id: "p1", firmId: "f1", clientId: "c1", status: "ativa", concedidaEm: "2025-04-02", expiraEm: "2027-04-02", servicos: ["Declarações", "Parcelamentos", "Restituição IR"] },
   { id: "p2", firmId: "f1", clientId: "c2", status: "ativa", concedidaEm: "2024-09-15", expiraEm: "2026-09-15", servicos: ["Declarações", "Parcelamentos"] },
@@ -317,7 +317,7 @@ export const DSARS: DSARRequest[] = [
   { id: "r3", firmId: "f1", titular: "Helena Costa (Studio Norte)", clientId: "c3", tipo: "portabilidade", recebidoEm: "2026-08-12", prazoResposta: "2026-08-27", status: "respondida", bloqueadaPorRetencao: false },
 ];
 
-/** Phase 2/3 capabilities ship off. Toggled from Admin › Módulos. */
+/** Capacidades de Fase 2/3 chegam desligadas. Ligadas em Admin › Módulos. */
 export const MODULES: ModuleState[] = [
   { slug: "auto-lancamento", nome: "Auto-lançamento", fase: 2, descricao: "Extratos, NF-e e relatórios viram lançamentos contábeis em rascunho, para revisão humana.", habilitado: false },
   { slug: "open-finance", nome: "Open Finance", fase: 2, descricao: "Conexão bancária via agregador licenciado, com consentimento itemizado e revogável.", habilitado: false },
@@ -326,8 +326,8 @@ export const MODULES: ModuleState[] = [
 ];
 
 /* ---------------------------------------------------------------------------
- * Accessors. Screens read through these, never the arrays directly, so this
- * file is the only thing that changes when a real database arrives.
+ * Acessores. As telas leem por aqui, nunca pelos arrays direto, para que este
+ * arquivo seja a única coisa a mudar quando entrar um banco de verdade.
  * ------------------------------------------------------------------------- */
 
 export function getClient(id: string): Client | undefined {
@@ -381,7 +381,7 @@ export interface DeptProgress {
   pct: number;
 }
 
-/** Percent of a department's workload closed for a competência — the status hub. */
+/** Percentual da carga do departamento fechada na competência — a central de status. */
 export function departmentProgress(competenciaId: string, clientId?: string): DeptProgress[] {
   return DEPARTMENTS.map((d) => {
     const ts = tasksFor({ competenciaId, departamento: d.slug, clientId });
@@ -398,7 +398,7 @@ export function departmentProgress(competenciaId: string, clientId?: string): De
   });
 }
 
-/** Firm-level numbers for the dashboard cards. */
+/** Números do escritório para os cartões do painel. */
 export function firmMetrics(competenciaId: string) {
   const ativos = CLIENTS.filter((c) => c.ativo);
   const ts = tasksFor({ competenciaId });
@@ -419,7 +419,7 @@ export function firmMetrics(competenciaId: string) {
   };
 }
 
-/** Clients blocked on a document nobody has chased — the #1 bottleneck. */
+/** Clientes travados em documento que ninguém cobrou — o gargalo nº 1. */
 export function bloqueiosPorCliente(competenciaId: string) {
   const rows = CLIENTS.filter((c) => c.ativo).map((c) => {
     const ts = tasksFor({ competenciaId, clientId: c.id });

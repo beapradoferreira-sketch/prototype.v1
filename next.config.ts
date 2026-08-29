@@ -4,8 +4,8 @@ const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "SAMEORIGIN" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-  // Prototype holds no real client data, but it is modelled on a system that
-  // would — keep it out of search indexes regardless.
+  // O protótipo não guarda dado real de cliente, mas é modelado sobre um sistema
+  // que guardaria — mantemos fora dos índices de busca de qualquer forma.
   { key: "X-Robots-Tag", value: "noindex, nofollow" },
 ];
 

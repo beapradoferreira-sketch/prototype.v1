@@ -1,11 +1,11 @@
 "use client";
 
-/* Screen 04 — Client database.
+/* Tela 04 — Base de clientes.
  *
- * Cadastro by grupo, segmento and regime tributário, with both CNPJ formats
- * live in the same list. Bulk export is gated by role: the exfiltration agent
- * in the brief exists precisely because an executor pulling the whole base is
- * the event worth catching.
+ * Cadastro por grupo, segmento e regime tributário, com os dois formatos de
+ * CNPJ convivendo na mesma lista. A exportação em massa é limitada por papel: o
+ * agente de exfiltração da especificação existe justamente porque um executor
+ * puxando a base inteira é o evento que vale pegar.
  */
 
 import Link from "next/link";
@@ -15,14 +15,7 @@ import { Badge, Card, PageHeader, Table, Td, currency } from "@/components/ui";
 import { canExportBulk } from "@/lib/access";
 import { CLIENTS, COMPETENCIA_ATUAL, procuracaoFor, tasksFor } from "@/lib/data";
 import { cnpjFormatLabel, formatCnpj, isValidCnpj } from "@/lib/cnpj";
-import type { RegimeTributario } from "@/lib/types";
-
-const REGIME_LABEL: Record<RegimeTributario, string> = {
-  "simples-nacional": "Simples Nacional",
-  "lucro-presumido": "Lucro Presumido",
-  "lucro-real": "Lucro Real",
-  mei: "MEI",
-};
+import { REGIME_LABEL } from "@/lib/labels";
 
 export default function ClientesPage() {
   const { viewer } = useSession();

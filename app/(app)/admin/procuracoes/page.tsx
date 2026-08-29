@@ -1,17 +1,18 @@
 "use client";
 
-/* Admin 03 — Procuração tracker.
+/* Admin 03 — Controle de procurações.
  *
- * This is what operationalises the per-client onboarding step the SERPRO
- * section identified: a contract is scoped to one e-CNPJ, so acting for a
- * client needs that client's electronic power of attorney first. Collecting and
- * tracking it is as much a feature as the API call.
+ * É o que operacionaliza o passo de onboarding por cliente identificado na
+ * seção do SERPRO: o contrato é preso a um e-CNPJ, então agir por um cliente
+ * exige antes a procuração eletrônica dele. Coletar e acompanhar isso é tanto
+ * funcionalidade quanto a própria chamada de API.
  */
 
 import Link from "next/link";
 import { Badge, Callout, PageHeader, Stat, Table, Td, shortDate } from "@/components/ui";
 import { CLIENTS, PROCURACOES, getClient } from "@/lib/data";
 import { formatCnpj } from "@/lib/cnpj";
+import { PROCURACAO_STATUS_LABEL } from "@/lib/labels";
 
 const TONE = { ativa: "green", pendente: "gold", expirada: "red", "nao-solicitada": "neutral" } as const;
 
@@ -59,7 +60,7 @@ export default function ProcuracoesPage() {
                 </Link>
               </Td>
               <Td className="font-mono text-[11.5px]">{c ? formatCnpj(c.cnpj) : "—"}</Td>
-              <Td><Badge tone={TONE[p.status]}>{p.status.replace("-", " ")}</Badge></Td>
+              <Td><Badge tone={TONE[p.status]}>{PROCURACAO_STATUS_LABEL[p.status]}</Badge></Td>
               <Td className="tabular-nums">{shortDate(p.concedidaEm)}</Td>
               <Td className="tabular-nums">{shortDate(p.expiraEm)}</Td>
               <Td className="text-xs">{p.servicos.length ? p.servicos.join(", ") : "—"}</Td>

@@ -1,11 +1,12 @@
 "use client";
 
-/* Screen 08 / Phase 3 — Automated agents.
+/* Tela 08 / Fase 3 — Agentes automatizados.
  *
- * Two families in one environment, kept visually distinct because they differ
- * in risk: process agents chase documents (safe to automate), defence agents
- * watch the system (the vendor-integrity one deliberately has no auto-remediate
- * tier — a wrong auto-retry against a government API causes its own problems).
+ * Duas famílias num ambiente só, visualmente separadas porque diferem em risco:
+ * agentes de processo cobram documento (seguro automatizar), agentes de defesa
+ * observam o sistema (o de integridade de fornecedor deliberadamente não tem
+ * camada de auto-remediação — retry errado contra API de governo cria problema
+ * próprio).
  */
 
 import { useSession } from "@/components/session";
@@ -14,6 +15,7 @@ import {
 } from "@/components/ui";
 import { FLAGS, MODULES } from "@/lib/data";
 import type { AgentSlug } from "@/lib/types";
+import { SEVERIDADE_LABEL } from "@/lib/labels";
 
 const DEFESA: {
   slug: AgentSlug; n: string; nome: string; observa: string; dispara: string; age: string;
@@ -111,7 +113,7 @@ export default function AgentesPage() {
           <div key={f.id} className="p-4">
             <div className="flex flex-wrap items-center gap-2">
               <Badge tone={f.severidade === "alta" ? "red" : f.severidade === "media" ? "gold" : "neutral"}>
-                {f.severidade}
+                {SEVERIDADE_LABEL[f.severidade]}
               </Badge>
               {f.escalarParaEncarregado && <Badge tone="navy">escalar ao encarregado</Badge>}
               <span className="ml-auto font-mono text-[11px] text-ink-3">{dateTime(f.em)}</span>

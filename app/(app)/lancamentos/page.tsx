@@ -1,13 +1,14 @@
 "use client";
 
-/* Screen 06 / Phase 2 — Auto-lançamento.
+/* Tela 06 / Fase 2 — Auto-lançamento.
  *
- * Ships disabled. The brief puts this at the highest ROI ceiling but real
- * engineering (parsing statements, NF-e, several report layouts), so it is
- * gated behind Admin › Módulos rather than half-built.
+ * Chega desligada. A especificação coloca isto no teto de maior retorno, mas é
+ * engenharia de verdade (parsear extratos, NF-e, vários layouts de relatório),
+ * então fica atrás do toggle em Admin › Módulos em vez de meio construída.
  *
- * The rule the screen encodes: entries are drafted, never posted. Automating
- * on top of undefined review responsibility just automates diffuse ownership.
+ * A regra que a tela codifica: lançamento entra como rascunho, nunca postado.
+ * Automatizar sobre responsabilidade de revisão indefinida só automatiza a
+ * responsabilidade difusa.
  */
 
 import { useSession } from "@/components/session";

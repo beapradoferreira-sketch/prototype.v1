@@ -1,15 +1,15 @@
 "use client";
 
-/* Prototype session.
+/* Sessão do protótipo.
  *
- * There is no authentication here on purpose (DECISIONS.md §4): real auth has
- * no open design questions, whereas the *consequences* of role — what is
- * visible, what is masked, what is logged — are the interesting part and are
- * fully implemented. This provider stands in for what a real session would
- * supply, so swapping in auth means changing this file only.
+ * Não há autenticação aqui de propósito (DECISOES.md §4): auth real não tem
+ * questão de desenho em aberto, ao passo que as *consequências* do papel — o
+ * que é visível, o que é mascarado, o que vai para o log — são a parte
+ * interessante e estão inteiramente implementadas. Este provider faz o papel do
+ * que uma sessão real forneceria, então ligar auth depois muda só este arquivo.
  *
- * Module toggles live here too, because Phase 2/3 capabilities ship disabled
- * and are switched on from Admin › Módulos.
+ * Os toggles de módulo também moram aqui, porque as capacidades de Fase 2/3
+ * chegam desligadas e são ligadas em Admin › Módulos.
  */
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
@@ -34,7 +34,7 @@ const DEFAULT_MODULES = Object.fromEntries(
   MODULES.map((m) => [m.slug, m.habilitado]),
 ) as Record<ModuleSlug, boolean>;
 
-/** One representative user per role, for the switcher. */
+/** Um usuário representativo por papel, para o seletor. */
 const CANDIDATES = ["u1", "u3", "u5"].map((id) => USERS.find((u) => u.id === id)!).filter(Boolean);
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
@@ -42,7 +42,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [modules, setModules] = useState<Record<ModuleSlug, boolean>>(DEFAULT_MODULES);
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
-  // Restore after mount so the server render stays deterministic.
+  // Restaura depois da montagem para o render do servidor seguir determinístico.
   useEffect(() => {
     try {
       const u = localStorage.getItem("ca.userId");
@@ -50,7 +50,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       const m = localStorage.getItem("ca.modules");
       if (m) setModules({ ...DEFAULT_MODULES, ...JSON.parse(m) });
     } catch {
-      /* private mode, blocked storage — defaults are fine */
+      /* aba anônima, storage bloqueado — os padrões servem */
     }
     const attr = document.documentElement.getAttribute("data-theme");
     setTheme(attr === "dark" ? "dark" : "light");

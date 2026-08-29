@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-/** Applied before first paint so a stored dark choice never flashes light. */
+/** Aplicado antes da primeira pintura para o tema escuro salvo não piscar claro. */
 const themeScript = `(function(){try{var t=localStorage.getItem('ca.theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

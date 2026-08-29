@@ -1,19 +1,20 @@
-/* Core entity model.
+/* Modelo de entidades.
  *
- * The brief listed "no entity schema exists yet" as blocking a Phase 1 build.
- * This is that schema. Notes on the three shapes that are load-bearing:
+ * A especificação listava "nenhum schema existe ainda" como impeditivo para a
+ * Fase 1. Este é o schema. Três formatos aqui carregam regra de negócio:
  *
- *  - Competencia is an entity, not a date field on Task. The business runs in
- *    monthly reference periods and the status hub needs to ask "state of this
- *    month, this client, this department" as a lookup.
- *  - Retention is tagged per Document. One client file legitimately mixes
- *    5-year fiscal, 10-year payroll and 30-year FGTS obligations; a per-client
- *    purge rule would either delete or retain something illegally.
- *  - Task.assigneeId is singular and required. Diffuse ownership is the failure
- *    mode the research named; shared ownership is made unrepresentable.
+ *  - Competencia é entidade, não um campo de data em Task. O negócio roda em
+ *    períodos mensais de referência, e a central de status precisa perguntar
+ *    "estado deste mês, deste cliente, neste departamento" como consulta direta.
+ *  - Retenção é etiquetada por Document. Um arquivo de cliente legitimamente
+ *    mistura obrigações de 5 anos (fiscal), 10 (folha) e 30 (FGTS); uma regra de
+ *    expurgo por cliente apagaria ou reteria algo ilegalmente.
+ *  - Task.assigneeId é singular e obrigatório. Responsabilidade difusa é o modo
+ *    de falha apontado pela pesquisa; posse compartilhada fica irrepresentável.
  *
- * Everything is scoped by firmId even though the prototype runs one firm, so
- * shape (B) — multi-tenant SaaS — is a query change rather than a migration.
+ * Tudo é escopado por firmId mesmo o protótipo rodando um único escritório,
+ * para que o formato (B) — SaaS multi-inquilino — seja mudança de consulta e
+ * não migração.
  */
 
 export type DepartmentSlug = "fiscal" | "pessoal" | "contabil" | "societario";
@@ -37,7 +38,7 @@ export interface Department {
   slug: DepartmentSlug;
   nome: string;
   descricao: string;
-  /** Departments this one waits on. The chain is document-gated and sequential. */
+  /** Departamentos de que este depende. A cadeia é sequencial e travada por documento. */
   dependeDe: DepartmentSlug[];
 }
 
@@ -47,7 +48,7 @@ export interface User {
   nome: string;
   email: string;
   role: Role;
-  /** Owners span every department; executors are scoped to exactly one. */
+  /** Diretoria abrange todos os departamentos; executor fica restrito a um. */
   departamentos: DepartmentSlug[];
   ativo: boolean;
   ultimoAcesso: string | null;
@@ -63,7 +64,7 @@ export interface Contato {
   nome: string;
   cargo: string;
   email: string;
-  /** Document delay is the #1 bottleneck; WhatsApp is where requests land. */
+  /** Atraso de documento é o gargalo nº 1; o WhatsApp é onde o pedido chega. */
   whatsapp: string | null;
 }
 
@@ -71,11 +72,11 @@ export interface ContaBancaria {
   banco: string;
   agencia: string;
   conta: string;
-  /** Connected via a licensed aggregator, never direct bank scraping. */
+  /** Conectado por agregador licenciado, nunca raspagem direta de banco. */
   openFinance: {
     conectado: boolean;
     consentimentoId: string | null;
-    /** Consent is time-bound and revocable in one action. */
+    /** Consentimento tem prazo e é revogável em uma única ação. */
     expiraEm: string | null;
   };
 }
@@ -85,7 +86,7 @@ export interface Client {
   firmId: string;
   razaoSocial: string;
   nomeFantasia: string;
-  /** Accepts both legacy numeric and alphanumeric (live July 2026) formats. */
+  /** Aceita o formato numérico clássico e o alfanumérico (vigente desde jul/2026). */
   cnpj: string;
   grupo: string | null;
   segmento: string;
@@ -96,17 +97,17 @@ export interface Client {
   contatos: Contato[];
   socios: Socio[];
   contas: ContaBancaria[];
-  /** Denormalised for list performance; derived from Task in a real backend. */
+  /** Desnormalizado para a listagem; derivado de Task num backend real. */
   responsaveis: Partial<Record<DepartmentSlug, string>>;
 }
 
-/** A monthly reference period. Competencia + client + department is the grain. */
+/** Período mensal de referência. Competência + cliente + departamento é a granularidade. */
 export interface Competencia {
   id: string; // "2026-08"
   ano: number;
   mes: number;
   label: string; // "Agosto 2026"
-  /** Closed periods are read-only. */
+  /** Competência encerrada é somente leitura. */
   encerrada: boolean;
 }
 
@@ -125,16 +126,16 @@ export interface Task {
   departamento: DepartmentSlug;
   competenciaId: string;
   titulo: string;
-  /** Exactly one owner, always. See the note at the top of this file. */
+  /** Exatamente um responsável, sempre. Ver a nota no topo do arquivo. */
   assigneeId: string;
   status: TaskStatus;
   prazo: string;
-  /** Set when the task is blocked on a document the client has not sent. */
+  /** Preenchido quando a tarefa trava em documento que o cliente não enviou. */
   bloqueadaPorDocumento: string | null;
   concluidaEm: string | null;
 }
 
-/** Retention classes carry different legal clocks — see DECISIONS.md §3. */
+/** Classes de retenção têm relógios legais distintos — ver DECISOES.md §3. */
 export type RetentionClass =
   | "fiscal-5a"
   | "folha-10a"
@@ -163,10 +164,10 @@ export interface Document {
   departamento: DepartmentSlug;
   recebidoEm: string | null;
   solicitadoEm: string | null;
-  /** Which channel the request went out on — WhatsApp, e-mail, portal. */
+  /** Por qual canal a solicitação saiu — WhatsApp, e-mail, portal. */
   canalSolicitacao: "whatsapp" | "email" | "portal" | null;
   retention: RetentionClass;
-  /** LGPD Art. 5 II. Masked unless the viewer's department owns the record. */
+  /** LGPD Art. 5º, II. Mascarado a menos que o departamento de quem vê seja o dono. */
   sensivel: boolean;
 }
 
@@ -177,9 +178,9 @@ export type ProcuracaoStatus =
   | "nao-solicitada";
 
 /**
- * SERPRO contracts are scoped to one e-CNPJ. Acting for a client requires that
- * client's electronic power of attorney first — a per-client onboarding step,
- * so it needs its own entity and its own screen.
+ * O contrato SERPRO é preso a um único e-CNPJ. Agir em nome de um cliente exige
+ * antes a procuração eletrônica daquele cliente — um passo de onboarding por
+ * cliente, e por isso com entidade e tela próprias.
  */
 export interface Procuracao {
   id: string;
@@ -207,10 +208,10 @@ export interface IntegrationCredential {
   nome: string;
   descricao: string;
   status: IntegrationStatus;
-  /** Certificate or API key expiry — what the hygiene agent watches. */
+  /** Vencimento de certificado ou chave — o que o agente de higiene observa. */
   expiraEm: string | null;
   ultimoSync: string | null;
-  /** Direction matters: Dominio's public API is push-only. */
+  /** Direção importa: a API pública do Domínio só aceita entrada. */
   direcao: "entrada" | "saida" | "bidirecional";
 }
 
@@ -230,7 +231,7 @@ export interface AuditEntry {
   acao: AuditAction;
   entidade: string;
   entidadeId: string;
-  /** Reads of sensitive fields are logged, not just writes. */
+  /** Leitura de campo sensível também vai para o log, não só escrita. */
   sensivel: boolean;
   tela: string;
   em: string;
@@ -254,12 +255,12 @@ export interface SecurityFlag {
   titulo: string;
   detalhe: string;
   em: string;
-  /** Anything touching personal data escalates to the encarregado, not an engineer. */
+  /** O que toca dado pessoal escala para o encarregado, não para um engenheiro. */
   escalarParaEncarregado: boolean;
   resolvida: boolean;
 }
 
-/** LGPD Art. 18 rights, handled as a queue rather than a policy PDF. */
+/** Direitos do Art. 18 da LGPD, tratados como fila e não como PDF de política. */
 export type DSARKind =
   | "acesso"
   | "correcao"
@@ -277,11 +278,11 @@ export interface DSARRequest {
   recebidoEm: string;
   prazoResposta: string;
   status: "aberta" | "em-analise" | "respondida";
-  /** Deletion often cannot be honoured — legal retention wins. */
+  /** Eliminação muitas vezes não pode ser atendida — a retenção legal prevalece. */
   bloqueadaPorRetencao: boolean;
 }
 
-/** Phase 2/3 capabilities ship disabled and are switched on from Admin. */
+/** Capacidades de Fase 2/3 chegam desligadas e são ligadas no Admin. */
 export type ModuleSlug =
   | "auto-lancamento"
   | "portal-cliente"

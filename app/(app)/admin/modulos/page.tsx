@@ -1,10 +1,10 @@
 "use client";
 
-/* Admin 07 — Module toggles.
+/* Admin 07 — Toggles de módulo.
  *
- * Phase 2/3 capabilities are switched on here as they are actually built,
- * without a redeploy. This is what turns the roadmap from a note in a document
- * into a working feature of the product.
+ * As capacidades de Fase 2/3 são ligadas aqui conforme ficam realmente prontas,
+ * sem redeploy. É o que transforma o roadmap de nota num documento em
+ * funcionalidade real do produto.
  */
 
 import Link from "next/link";

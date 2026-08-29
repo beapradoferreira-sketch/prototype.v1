@@ -1,20 +1,21 @@
-/* CNPJ — dual format.
+/* CNPJ — formato duplo.
  *
- * Since July 2026 new registrations can receive a CNPJ whose 12-character base
- * mixes letters and digits. Existing all-numeric CNPJs stay valid forever, so
- * both formats have to be accepted everywhere, from the first schema onward.
+ * Desde julho de 2026 novas inscrições podem receber um CNPJ cuja base de 12
+ * caracteres mistura letras e dígitos. Os CNPJs numéricos existentes seguem
+ * válidos para sempre, então os dois formatos precisam ser aceitos em todo
+ * lugar, desde o primeiro schema.
  *
- * The check digits are still numeric and still mod-11. The only change is how a
- * character contributes: its ASCII code minus 48. That makes '0'-'9' worth 0-9
- * exactly as before, and 'A'-'Z' worth 17-42 — which is why the legacy
- * algorithm keeps working unchanged for legacy numbers.
+ * Os dígitos verificadores continuam numéricos e continuam mod-11. A única
+ * mudança é quanto cada caractere contribui: seu código ASCII menos 48. Assim
+ * '0'-'9' valem 0-9 exatamente como antes, e 'A'-'Z' valem 17-42 — que é o
+ * motivo de o algoritmo antigo continuar funcionando para os números antigos.
  */
 
 const BASE_LENGTH = 12;
 const FULL_LENGTH = 14;
 const WEIGHTS = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
 
-/** Strip formatting and normalise case. Letters are always uppercase. */
+/** Remove formatação e normaliza a caixa. Letras sempre em maiúsculas. */
 export function normalizeCnpj(input: string): string {
   return input.replace(/[^0-9A-Za-z]/g, "").toUpperCase();
 }
@@ -23,7 +24,7 @@ export function isAlphanumericCnpj(input: string): boolean {
   return /[A-Z]/.test(normalizeCnpj(input));
 }
 
-/** Value of one character for the mod-11 sum: ASCII − 48. */
+/** Valor de um caractere para a soma mod-11: ASCII − 48. */
 function charValue(ch: string): number {
   return ch.charCodeAt(0) - 48;
 }
@@ -38,7 +39,7 @@ function checkDigit(chars: string): number {
   return rest < 2 ? 0 : 11 - rest;
 }
 
-/** Compute both check digits for a 12-character base. */
+/** Calcula os dois dígitos verificadores de uma base de 12 caracteres. */
 export function computeCheckDigits(base: string): string {
   const b = normalizeCnpj(base);
   if (b.length !== BASE_LENGTH) {
@@ -56,24 +57,24 @@ export function isValidCnpj(input: string): boolean {
   const base = value.slice(0, BASE_LENGTH);
   const digits = value.slice(BASE_LENGTH);
 
-  // Base may be alphanumeric; the two check digits never are.
+  // A base pode ser alfanumérica; os dois dígitos verificadores nunca são.
   if (!/^[0-9A-Z]{12}$/.test(base)) return false;
   if (!/^[0-9]{2}$/.test(digits)) return false;
 
-  // Reject repeated-character bases (00000000000000 and friends).
+  // Rejeita bases de caractere repetido (00000000000000 e semelhantes).
   if (/^(.)\1{11}$/.test(base)) return false;
 
   return computeCheckDigits(base) === digits;
 }
 
-/** Format as XX.XXX.XXX/XXXX-NN. Works for both formats. */
+/** Formata como XX.XXX.XXX/XXXX-NN. Funciona nos dois formatos. */
 export function formatCnpj(input: string): string {
   const v = normalizeCnpj(input);
   if (v.length !== FULL_LENGTH) return input;
   return `${v.slice(0, 2)}.${v.slice(2, 5)}.${v.slice(5, 8)}/${v.slice(8, 12)}-${v.slice(12)}`;
 }
 
-/** Label for UI badges, so the two formats are visibly distinguished. */
+/** Rótulo para os selos da interface, distinguindo os dois formatos. */
 export function cnpjFormatLabel(input: string): "alfanumérico" | "numérico" {
   return isAlphanumericCnpj(input) ? "alfanumérico" : "numérico";
 }

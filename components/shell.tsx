@@ -71,7 +71,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-dvh">
-      {/* Top bar */}
+      {/* Barra superior */}
       <header className="sticky top-0 z-30 border-b border-line bg-surface/95 backdrop-blur">
         <div className="flex items-center gap-3 px-4 py-2.5">
           <button
@@ -100,8 +100,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
           </span>
 
           <div className="ml-auto flex items-center gap-2">
-            {/* Role switcher — stands in for auth. Labelled so it is never
-                mistaken for an access control. */}
+            {/* Seletor de papel — no lugar da autenticação. Rotulado para nunca
+                ser confundido com controle de acesso. */}
             <label className="hidden items-center gap-2 sm:flex">
               <span className="font-mono text-[10.5px] uppercase tracking-wider text-ink-3">
                 Protótipo · papel
@@ -141,15 +141,15 @@ export function Shell({ children }: { children: React.ReactNode }) {
       </header>
 
       <div className="mx-auto flex max-w-[1400px]">
-        {/* Sidebar */}
+        {/* Menu lateral */}
         <aside
           className={`${
             open ? "block" : "hidden"
           } fixed inset-x-0 top-[53px] z-20 max-h-[calc(100dvh-53px)] overflow-y-auto border-b border-line bg-surface px-3 pb-6 lg:sticky lg:top-[53px] lg:block lg:h-[calc(100dvh-53px)] lg:w-60 lg:shrink-0 lg:border-b-0 lg:border-r`}
           onClick={() => setOpen(false)}
         >
-          {/* The role switcher is the whole point of the prototype, so it has to
-              be reachable on a phone too — the top bar has no room for it there. */}
+          {/* O seletor de papel é o ponto central do protótipo, então precisa
+              ser alcançável no celular também — no topo não cabe nessa largura. */}
           <label className="mt-2 block px-3 sm:hidden" onClick={(e) => e.stopPropagation()}>
             <span className="font-mono text-[10.5px] uppercase tracking-wider text-ink-3">
               Protótipo · papel

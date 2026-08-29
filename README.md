@@ -1,17 +1,18 @@
 # Contabilidade Automatizada
 
-Clickable prototype of an internal operations platform for a Brazilian
-accounting firm — the application the brief specified, not the brief itself.
+Protótipo navegável de uma plataforma interna de operações para escritório
+contábil brasileiro — a aplicação que a especificação descreve, não a
+especificação em si.
 
-Four departments with the real dependency chain between them, a client base
-carrying both CNPJ formats, a per-competência status hub, and a directors'
-panel covering integrations, powers of attorney, audit and the LGPD queue.
+Quatro departamentos com a cadeia de dependência real entre eles, base de
+clientes com os dois formatos de CNPJ, central de status por competência e um
+painel da diretoria cobrindo integrações, procurações, auditoria e a fila LGPD.
 
-> **Prototype, not production.** No authentication, no database, no real client
-> data. Every CNPJ is invented; they carry valid check digits only so the
-> validator is genuinely exercised.
+> **Protótipo, não produção.** Sem autenticação, sem banco de dados, sem dado
+> real de cliente. Todo CNPJ é inventado; eles têm dígito verificador válido
+> apenas para exercitar o validador de verdade.
 
-## Running it
+## Rodando localmente
 
 ```bash
 npm install
@@ -21,82 +22,95 @@ npm install
 npm run dev
 ```
 
-Then open <http://localhost:3000>. Production build: `npm run build && npm start`.
+Abra <http://localhost:3000>.
 
-## Deploying on Vercel
+| Script | O que faz |
+| --- | --- |
+| `npm run dev` | Servidor de desenvolvimento |
+| `npm run build` | Build de produção |
+| `npm start` | Sobe o build de produção |
+| `npm run typecheck` | Checagem de tipos, sem emitir arquivos |
 
-Zero configuration. Import the repo at [vercel.com/new](https://vercel.com/new)
-— Vercel detects Next.js and applies the right build and output settings
-automatically. Nothing to fill in, no environment variables, no external
-services.
+> **Não rode `npm run build` com o `npm run dev` ligado.** Os dois escrevem no
+> mesmo diretório `.next` e o cache corrompe — o sintoma é CSS servido como
+> `text/plain` e erros do tipo `Cannot find module './805.js'`. Se acontecer:
+> pare o servidor, `rm -rf .next` e suba de novo.
+
+## Publicando na Vercel
+
+Zero configuração. Importe o repositório em [vercel.com/new](https://vercel.com/new)
+— a Vercel detecta Next.js e preenche build, output e install sozinha. Nada a
+configurar, sem variável de ambiente, sem serviço externo.
 
 ```bash
 npx vercel --prod
 ```
 
-## What is where
+## Onde fica cada coisa
 
 ```
 app/
-├── page.tsx                  Screen 01 — role selection (stands in for login)
-├── layout.tsx                fonts, theme bootstrap, session provider
-├── globals.css               design tokens (light + dark)
+├── page.tsx                  Tela 01 — seleção de papel (no lugar do login)
+├── layout.tsx                fontes, tema, provider de sessão
+├── globals.css               tokens de design (claro + escuro)
 └── (app)/
-    ├── layout.tsx            shell: sidebar, top bar, role switcher
-    ├── dashboard/            Screen 02 + 03 — firm dashboard, scoped by role
-    ├── status/               Screen 05 — the client × department matrix
-    ├── clientes/             Screen 04 — client database
-    │   └── [id]/             client detail: masking + per-doc retention
-    ├── departamentos/[slug]/ the four department workspaces
-    ├── lancamentos/          Screen 06 — auto-lançamento (Phase 2, gated)
-    ├── agentes/              Screen 08 — agents environment (Phase 3, gated)
-    ├── portal/               client portal preview (Phase 3, gated)
-    ├── spec/                 the decisions, readable inside the app
-    └── admin/                the Owner tier — 8 screens
+    ├── layout.tsx            shell: menu lateral, topo, troca de papel
+    ├── dashboard/            Telas 02 + 03 — painel, recortado por papel
+    ├── status/               Tela 05 — matriz cliente × departamento
+    ├── clientes/             Tela 04 — base de clientes
+    │   └── [id]/             detalhe: mascaramento + retenção por documento
+    ├── departamentos/[slug]/ os quatro departamentos
+    ├── lancamentos/          Tela 06 — auto-lançamento (Fase 2, desligado)
+    ├── agentes/              Tela 08 — agentes (Fase 3, desligado)
+    ├── portal/               portal do cliente (Fase 3, desligado)
+    ├── spec/                 as decisões, legíveis dentro do app
+    └── admin/                o nível Diretoria — 8 telas
 lib/
-├── types.ts                  the entity model the brief said was missing
-├── data.ts                   seed dataset + accessors (swap for a DB)
-├── cnpj.ts                   dual-format CNPJ validation
-└── access.ts                 role scoping and LGPD field masking
-docs/DECISIONS.md             every open question, and what was decided
+├── types.ts                  o modelo de entidades que faltava
+├── data.ts                   dados de exemplo + acessores (trocar por banco)
+├── cnpj.ts                   validação de CNPJ nos dois formatos
+├── labels.ts                 todo rótulo visível, em pt-BR
+└── access.ts                 escopo por papel e mascaramento LGPD
+docs/DECISOES.md              cada questão em aberto, e o que foi decidido
 ```
 
-## The parts worth looking at
+## O que vale olhar
 
-**The status hub** (`/status`) is the screen the brief ranks highest: cheapest
-to build, attacks the most-cited pain point, no external dependency. It answers
-"which client is stuck at which department, this month" as a grid.
+**A central de status** (`/status`) é a tela que a especificação coloca como de
+maior alavancagem: a mais barata de construir, ataca a dor mais citada e não
+depende de nenhuma API externa. Responde "qual cliente está travado em qual
+departamento, neste mês" como uma grade.
 
-**Role scoping is enforced, not decorative.** Switch to *Executor — Rafael Lima*
-in the top bar and visit `/departamentos/pessoal`: refused at the route, not
-merely hidden from the nav. Visit `/clientes/c1` as the same user and the
-atestado médico is masked — the row stays visible so the file does not look
-incomplete, but the content does not.
+**O escopo por papel é aplicado, não decorativo.** Troque para *Executor —
+Rafael Lima* no topo e vá em `/departamentos/pessoal`: negado na rota, não
+apenas escondido do menu. Abra `/clientes/c1` com o mesmo usuário e o atestado
+médico aparece mascarado — a linha continua visível para o arquivo não parecer
+incompleto, o conteúdo não.
 
-**Retention is per document, not per client.** One client file mixes a 5-year
-fiscal document, a 10-year payroll record and a 30-year FGTS guide. A
-per-client purge rule would necessarily either delete or retain something
-illegally.
+**Retenção é por documento, nunca por cliente.** Um arquivo de cliente mistura
+documento fiscal de 5 anos, folha de 10 e guia de FGTS de 30. Uma regra de
+expurgo por cliente necessariamente apagaria ou reteria algo ilegalmente.
 
-**CNPJ accepts both formats** from the first schema. `lib/cnpj.ts` implements
-the mod-11 check with character value = ASCII − 48, verified against Receita's
-own worked example (`12ABC34501DE` → check digits `35`).
+**CNPJ aceita os dois formatos** desde o primeiro schema. O `lib/cnpj.ts`
+implementa o mod-11 com valor de caractere = ASCII − 48, conferido contra o
+exemplo oficial da Receita (`12ABC34501DE` → dígitos `35`).
 
-**Phases 2 and 3 ship disabled.** Auto-lançamento, the client portal and the
-agents environment are built but switched off, and are turned on from
-*Admin › Módulos* without a redeploy. That makes the phased roadmap a working
-feature rather than a note in a document.
+**Fases 2 e 3 chegam desligadas.** Auto-lançamento, portal do cliente e o
+ambiente de agentes estão construídos, mas desativados, e são ligados em
+*Admin › Módulos* sem redeploy. Isso torna o roadmap faseado uma
+funcionalidade real em vez de uma nota num documento.
 
-## Open questions from the brief
+## Questões em aberto da especificação
 
-The brief left six items marked as blocking a Phase 1 build. All are resolved
-in [`docs/DECISIONS.md`](docs/DECISIONS.md) — stack, entity model, auth,
-roadmap scope, CNPJ handling — along with the four that were deliberately left
-open because they need information a prototype cannot invent (aggregator
-choice, whether to contract SERPRO now, Phase 1 exit criteria, and backup/DR).
+A especificação marcava seis itens como impeditivos para a Fase 1. Todos estão
+resolvidos em [`docs/DECISOES.md`](docs/DECISOES.md) — stack, modelo de
+entidades, autenticação, escopo do roadmap, CNPJ — junto com os quatro que
+ficaram deliberadamente em aberto por dependerem de informação que um protótipo
+não pode inventar (escolha de agregador, contratar o SERPRO agora, critério de
+saída da Fase 1, e backup/recuperação de desastre).
 
 ## Stack
 
-Next.js 15 (App Router) · TypeScript · Tailwind v4 · no other runtime
-dependencies. Fonts are self-hosted through `next/font`, so the deployed page
-makes no third-party requests.
+Next.js 15 (App Router) · TypeScript · Tailwind v4 · nenhuma outra dependência
+de runtime. As fontes são servidas pelo próprio projeto via `next/font`, então
+a página publicada não faz requisição a terceiros.

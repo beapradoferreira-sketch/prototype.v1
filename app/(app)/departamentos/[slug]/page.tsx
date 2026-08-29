@@ -1,12 +1,12 @@
 "use client";
 
-/* Department workspace.
+/* Área do departamento.
  *
- * One route serves all four departments. The important behaviour is the
- * dependency chain: Contábil waits on Fiscal and Pessoal, so its screen shows
- * upstream readiness rather than pretending its work can start early. An
- * executor reaching a department outside their scope is refused here, not
- * merely hidden from the nav.
+ * Uma rota atende os quatro departamentos. O comportamento importante é a
+ * cadeia de dependência: o Contábil espera Fiscal e Pessoal, então a tela dele
+ * mostra o preparo do que vem acima em vez de fingir que o trabalho pode
+ * começar antes. Um executor que chega a um departamento fora do seu escopo é
+ * recusado aqui, não apenas escondido do menu.
  */
 
 import Link from "next/link";
@@ -47,7 +47,7 @@ export default function DepartamentoPage({ params }: { params: Promise<{ slug: s
     );
   }
 
-  // Scope is enforced at the route, not only in the navigation.
+  // O escopo é aplicado na rota, não apenas na navegação.
   if (!canAccessDepartment(viewer, dept.slug)) {
     return (
       <Card className="p-10 text-center">
@@ -69,7 +69,7 @@ export default function DepartamentoPage({ params }: { params: Promise<{ slug: s
   const tasks = filtro === "todas" ? all : all.filter((t) => t.status === filtro);
   const progress = departmentProgress(compId).find((p) => p.slug === dept.slug)!;
 
-  // Upstream readiness — the chain is document-gated and sequential.
+  // Preparo do que vem acima — a cadeia é sequencial e travada por documento.
   const upstream = dept.dependeDe.map((s) => ({
     dept: getDepartment(s)!,
     progress: departmentProgress(compId).find((p) => p.slug === s)!,
@@ -188,7 +188,7 @@ export default function DepartamentoPage({ params }: { params: Promise<{ slug: s
                 {getClient(t.clientId)?.nomeFantasia}
               </Link>
             </Td>
-            {/* Exactly one owner, always — shared ownership is unrepresentable. */}
+            {/* Exatamente um responsável, sempre — posse compartilhada é irrepresentável. */}
             <Td>{getUser(t.assigneeId)?.nome ?? "—"}</Td>
             <Td className="tabular-nums">{shortDate(t.prazo)}</Td>
             <Td><StatusBadge status={t.status} /></Td>

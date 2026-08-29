@@ -1,11 +1,11 @@
 "use client";
 
-/* Screen 01 — Home / login.
+/* Tela 01 — Home / login.
  *
- * The draft specifies role-based access with department and diretoria selected
- * on entry. There is no real authentication in the prototype (DECISIONS.md §4),
- * so this screen picks an identity instead of verifying one — and says so,
- * plainly, rather than dressing up a fake password field.
+ * O rascunho especifica acesso por papel, com departamento e diretoria
+ * escolhidos na entrada. Não há autenticação real no protótipo (DECISOES.md
+ * §4), então esta tela escolhe uma identidade em vez de verificá-la — e diz
+ * isso com todas as letras, em vez de fingir um campo de senha.
  */
 
 import Link from "next/link";

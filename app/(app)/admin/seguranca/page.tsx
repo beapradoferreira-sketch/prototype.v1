@@ -1,26 +1,18 @@
 "use client";
 
-/* Admin 04 — Security console.
+/* Admin 04 — Console de segurança.
  *
- * Where the six agents surface. The escalation rule is the point: low severity
- * auto-remediates with a log entry, anything touching personal data goes to the
- * encarregado rather than an engineer — and the ANPD clock is on screen because
- * without automated detection, day 1 of the 3-day window is whenever someone
- * happens to notice.
+ * Onde os seis agentes aparecem. A regra de escalonamento é o ponto: severidade
+ * baixa auto-remedia com registro em log, qualquer coisa que toque dado pessoal
+ * vai para o encarregado e não para um engenheiro — e o relógio da ANPD fica na
+ * tela porque, sem detecção automática, o dia 1 da janela de 3 dias é quando
+ * alguém por acaso reparar.
  */
 
 import { useState } from "react";
 import { Badge, Callout, Card, PageHeader, SectionTitle, dateTime } from "@/components/ui";
 import { FLAGS, getUser, FIRM } from "@/lib/data";
-
-const AGENTE_LABEL: Record<string, string> = {
-  "acesso-anomalo": "Acesso anômalo",
-  exfiltracao: "Exfiltração",
-  credenciais: "Credenciais e procurações",
-  "campos-sensiveis": "Campos sensíveis",
-  "superficie-externa": "Superfície externa",
-  "integridade-vendor": "Integridade de fornecedor",
-};
+import { AGENTE_LABEL, SEVERIDADE_LABEL } from "@/lib/labels";
 
 export default function SegurancaPage() {
   const [mostrarResolvidas, setMostrarResolvidas] = useState(false);
@@ -66,7 +58,7 @@ export default function SegurancaPage() {
           <div key={f.id} className={`p-4 ${f.resolvida ? "opacity-60" : ""}`}>
             <div className="flex flex-wrap items-center gap-2">
               <Badge tone={f.severidade === "alta" ? "red" : f.severidade === "media" ? "gold" : "neutral"}>
-                {f.severidade}
+                {SEVERIDADE_LABEL[f.severidade]}
               </Badge>
               <Badge tone="neutral">{AGENTE_LABEL[f.agente]}</Badge>
               {f.escalarParaEncarregado && <Badge tone="navy">escalar ao encarregado</Badge>}

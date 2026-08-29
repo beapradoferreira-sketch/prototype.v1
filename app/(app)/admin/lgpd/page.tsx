@@ -1,12 +1,14 @@
 "use client";
 
-/* Admin 06 — LGPD: Art. 18 queue plus the retention table, editable rather
- * than hardcoded. Deletion frequently cannot be honoured because legal
- * retention wins, and the queue has to show that rather than silently failing.
+/* Admin 06 — LGPD: fila do Art. 18 mais a tabela de retenção, editável em vez
+ * de cravada no código. Eliminação com frequência não pode ser atendida porque
+ * a retenção legal prevalece, e a fila precisa mostrar isso em vez de falhar
+ * em silêncio.
  */
 
 import { Badge, Callout, Card, PageHeader, SectionTitle, Table, Td, shortDate } from "@/components/ui";
 import { DSARS, FIRM, getClient, getUser } from "@/lib/data";
+import { DSAR_STATUS_LABEL } from "@/lib/labels";
 
 const RETENCAO = [
   { categoria: "Documentos fiscais", onde: "Notas, livros contábeis, declarações", prazo: "5 anos", base: "CTN Art. 173–174" },
@@ -69,7 +71,7 @@ export default function LgpdPage() {
               <Td className="tabular-nums">{shortDate(d.prazoResposta)}</Td>
               <Td>
                 <Badge tone={d.status === "respondida" ? "green" : d.status === "em-analise" ? "gold" : "neutral"}>
-                  {d.status.replace("-", " ")}
+                  {DSAR_STATUS_LABEL[d.status]}
                 </Badge>
               </Td>
               <Td>

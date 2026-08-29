@@ -1,8 +1,9 @@
-/* Shared presentation primitives. Server-safe (no hooks). */
+/* Primitivos de apresentação compartilhados. Seguros no servidor (sem hooks). */
 
 import Link from "next/link";
 import type { ReactNode } from "react";
 import type { TaskStatus } from "@/lib/types";
+import { TAREFA_STATUS_LABEL } from "@/lib/labels";
 
 export function Card({
   children,
@@ -73,25 +74,21 @@ export function Stat({
   );
 }
 
-const STATUS_STYLE: Record<TaskStatus, { label: string; cls: string }> = {
-  pendente: { label: "Pendente", cls: "bg-surface-2 text-ink-2 border-line" },
-  "aguardando-cliente": {
-    label: "Aguardando cliente",
-    cls: "bg-gold-soft text-gold border-gold/30",
-  },
-  "em-andamento": { label: "Em andamento", cls: "bg-navy-soft text-navy-ink border-navy/25" },
-  "em-revisao": { label: "Em revisão", cls: "bg-navy-soft text-navy-ink border-navy/25" },
-  concluida: { label: "Concluída", cls: "bg-green-soft text-green border-green/30" },
-  atrasada: { label: "Atrasada", cls: "bg-red-soft text-red border-red/30" },
+const STATUS_STYLE: Record<TaskStatus, string> = {
+  pendente: "bg-surface-2 text-ink-2 border-line",
+  "aguardando-cliente": "bg-gold-soft text-gold border-gold/30",
+  "em-andamento": "bg-navy-soft text-navy-ink border-navy/25",
+  "em-revisao": "bg-navy-soft text-navy-ink border-navy/25",
+  concluida: "bg-green-soft text-green border-green/30",
+  atrasada: "bg-red-soft text-red border-red/30",
 };
 
 export function StatusBadge({ status }: { status: TaskStatus }) {
-  const s = STATUS_STYLE[status];
   return (
     <span
-      className={`inline-block whitespace-nowrap rounded-md border px-2 py-0.5 text-[11px] font-medium ${s.cls}`}
+      className={`inline-block whitespace-nowrap rounded-md border px-2 py-0.5 text-[11px] font-medium ${STATUS_STYLE[status]}`}
     >
-      {s.label}
+      {TAREFA_STATUS_LABEL[status]}
     </span>
   );
 }
@@ -127,7 +124,7 @@ export function Mono({ children }: { children: ReactNode }) {
   );
 }
 
-/** Progress bar. Green only when complete — green means confirmation here. */
+/** Barra de progresso. Verde só quando fecha — aqui verde significa confirmação. */
 export function Progress({ pct }: { pct: number }) {
   const tone = pct === 100 ? "bg-green" : pct >= 50 ? "bg-navy" : "bg-gold";
   return (
@@ -213,7 +210,7 @@ export function EmptyState({ title, note }: { title: string; note?: string }) {
   );
 }
 
-/** Phase 2/3 screens render this when their module is switched off. */
+/** Telas de Fase 2/3 renderizam isto quando o módulo está desligado. */
 export function ModuleDisabled({ nome, fase, descricao }: { nome: string; fase: number; descricao: string }) {
   return (
     <Card className="p-10 text-center">

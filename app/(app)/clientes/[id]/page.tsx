@@ -1,13 +1,14 @@
 "use client";
 
-/* Client detail.
+/* Detalhe do cliente.
  *
- * Where three rules from the brief become visible at once:
- *  - sensitive documents are masked unless the viewer's department owns them,
- *    and the row still exists so the file does not look incomplete;
- *  - retention is tagged per document, never per client — one file here mixes
- *    5-year fiscal, 10-year payroll and 30-year FGTS clocks;
- *  - Open Finance consent is itemised, time-bound and revocable in one action.
+ * Onde três regras da especificação ficam visíveis de uma vez:
+ *  - documento sensível é mascarado a menos que o departamento de quem vê seja
+ *    o dono, e a linha continua existindo para o arquivo não parecer incompleto;
+ *  - retenção é por documento, nunca por cliente — um arquivo aqui mistura os
+ *    relógios de 5 anos (fiscal), 10 (folha) e 30 (FGTS);
+ *  - o consentimento de Open Finance é itemizado, com prazo e revogável em uma
+ *    única ação.
  */
 
 import Link from "next/link";
@@ -23,16 +24,9 @@ import {
   procuracaoFor, tasksFor,
 } from "@/lib/data";
 import { cnpjFormatLabel, formatCnpj } from "@/lib/cnpj";
-import type { RetentionClass } from "@/lib/types";
-
-const RETENTION_LABEL: Record<RetentionClass, string> = {
-  "fiscal-5a": "Fiscal — 5 anos (CTN 173–174)",
-  "folha-10a": "Folha — 10 anos (Dec. 3.048/1999)",
-  "fgts-30a": "FGTS — 30 anos",
-  "contrato-indeterminado": "Contrato — indeterminado",
-  "rescisao-2a": "Rescisão — 2 anos",
-  consentimento: "Consentimento — enquanto vigente",
-};
+import {
+  CANAL_LABEL, DEPARTAMENTO_LABEL, REGIME_LABEL, RETENCAO_LABEL,
+} from "@/lib/labels";
 
 export default function ClientePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -75,8 +69,8 @@ export default function ClientePage({ params }: { params: Promise<{ id: string }
         </Card>
         <Card className="p-4">
           <p className="font-mono text-[11px] uppercase tracking-wider text-ink-3">Regime</p>
-          <p className="mt-1 font-display text-[15px] font-bold capitalize text-ink">
-            {client.regime.replace(/-/g, " ")}
+          <p className="mt-1 font-display text-[15px] font-bold text-ink">
+            {REGIME_LABEL[client.regime]}
           </p>
           <p className="mt-1 text-xs text-ink-3">{client.segmento}</p>
         </Card>
@@ -176,15 +170,16 @@ export default function ClientePage({ params }: { params: Promise<{ id: string }
                     )}
                     {!d.recebidoEm && d.solicitadoEm && (
                       <p className="mt-1 font-mono text-[10.5px] text-gold">
-                        solicitado {shortDate(d.solicitadoEm)} via {d.canalSolicitacao}
+                        solicitado {shortDate(d.solicitadoEm)} via{" "}
+                        {d.canalSolicitacao ? CANAL_LABEL[d.canalSolicitacao] : "—"}
                       </p>
                     )}
                   </Td>
-                  <Td className="capitalize">{d.departamento}</Td>
+                  <Td>{DEPARTAMENTO_LABEL[d.departamento]}</Td>
                   <Td>
                     {d.recebidoEm ? shortDate(d.recebidoEm) : <Badge tone="gold">pendente</Badge>}
                   </Td>
-                  <Td className="text-xs">{RETENTION_LABEL[d.retention]}</Td>
+                  <Td className="text-xs">{RETENCAO_LABEL[d.retention]}</Td>
                 </tr>
               ))}
             </Table>

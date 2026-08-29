@@ -1,11 +1,11 @@
 "use client";
 
-/* Phase 3 — Client portal (internal preview).
+/* Fase 3 — Portal do cliente (prévia interna).
  *
- * This is what the firm sees of the client-facing surface. The portal proper is
- * a separate deployment target; what matters at this stage is that document
- * requests go out on the channel clients actually answer, and that Art. 18
- * requests have somewhere to land.
+ * É o que o escritório enxerga da superfície voltada ao cliente. O portal em si
+ * é um alvo de deploy separado; o que importa neste estágio é que a solicitação
+ * de documento saia pelo canal que o cliente de fato responde, e que os pedidos
+ * do Art. 18 tenham onde cair.
  */
 
 import { useSession } from "@/components/session";
@@ -13,6 +13,7 @@ import {
   Badge, Callout, Card, ModuleDisabled, PageHeader, SectionTitle, Table, Td, shortDate,
 } from "@/components/ui";
 import { DOCUMENTS, MODULES, getClient } from "@/lib/data";
+import { CANAL_LABEL } from "@/lib/labels";
 
 export default function PortalPage() {
   const { modules } = useSession();
@@ -54,7 +55,7 @@ export default function PortalPage() {
             <Td>{getClient(d.clientId)?.nomeFantasia}</Td>
             <Td>
               <Badge tone={d.canalSolicitacao === "whatsapp" ? "green" : "neutral"}>
-                {d.canalSolicitacao}
+                {d.canalSolicitacao ? CANAL_LABEL[d.canalSolicitacao] : "—"}
               </Badge>
             </Td>
             <Td className="tabular-nums">{shortDate(d.solicitadoEm)}</Td>
