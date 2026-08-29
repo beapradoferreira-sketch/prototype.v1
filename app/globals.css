@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+/* Dark mode is driven by an explicit attribute on <html>, set before first
+   paint by an inline script. Default resolves from the OS. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* Palette: the brief's "classic & sober" direction — navy as the trust anchor,
+   green reserved strictly for confirmation states, red meaning exactly one
+   thing (missed prazo / failed integration), gold as a sparing accent. */
+:root {
+  --bg: #f6f7f8;
+  --surface: #ffffff;
+  --surface-2: #edf1f4;
+  --line: #dbe2e8;
+  --line-strong: #c3cfd9;
+  --ink: #14202b;
+  --ink-2: #46586a;
+  --ink-3: #7c8b99;
+  --navy: #1b3a5c;
+  --navy-ink: #123048;
+  --navy-soft: #e8eef5;
+  --green: #1e6f5c;
+  --green-soft: #e7f2ee;
+  --gold: #9c7a32;
+  --gold-soft: #fbefe4;
+  --red: #a63232;
+  --red-soft: #fbeaea;
+}
+
+[data-theme="dark"] {
+  --bg: #10161d;
+  --surface: #161f29;
+  --surface-2: #1c2732;
+  --line: #2b3948;
+  --line-strong: #3b4c5e;
+  --ink: #e8edf2;
+  --ink-2: #aebbc7;
+  --ink-3: #7c8c9b;
+  --navy: #7ca6d9;
+  --navy-ink: #9cbee6;
+  --navy-soft: #17283a;
+  --green: #4fbf9f;
+  --green-soft: #16332b;
+  --gold: #d8b667;
+  --gold-soft: #33281a;
+  --red: #e08585;
+  --red-soft: #33201f;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-navy: var(--navy);
+  --color-navy-ink: var(--navy-ink);
+  --color-navy-soft: var(--navy-soft);
+  --color-green: var(--green);
+  --color-green-soft: var(--green-soft);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-red: var(--red);
+  --color-red-soft: var(--red-soft);
+
+  --font-display: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+}
+
+html {
+  color-scheme: light;
+}
+[data-theme="dark"] html,
+html[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--green-soft);
+}
+
+/* Focus ring — visible on every interactive element, both themes. */
+:focus-visible {
+  outline: 2px solid var(--navy);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Thin scrollbars inside scroll regions so wide tables don't look broken. */
+.scroll-x {
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
