@@ -12,10 +12,10 @@
  */
 
 import { useSession } from "@/components/session";
+import { ModuleGate } from "@/components/module-gate";
 import {
-  Badge, Callout, Card, ModuleDisabled, PageHeader, SectionTitle, Table, Td, currency,
+  Badge, Callout, Card, PageHeader, SectionTitle, Table, Td, currency,
 } from "@/components/ui";
-import { MODULES } from "@/lib/data";
 
 const RASCUNHOS = [
   { id: "l1", data: "2026-08-12", historico: "Recebimento cliente — PIX", debito: "1.1.1.02 Banco c/ Movimento", credito: "1.1.2.01 Clientes", valor: 4820.5, origem: "Extrato BB", confianca: 0.97 },
@@ -26,13 +26,12 @@ const RASCUNHOS = [
 
 export default function LancamentosPage() {
   const { modules } = useSession();
-  const mod = MODULES.find((m) => m.slug === "auto-lancamento")!;
 
   if (!modules["auto-lancamento"]) {
     return (
       <>
         <PageHeader title="Auto-lançamento" note="Fase 2 — núcleo de automação" />
-        <ModuleDisabled nome={mod.nome} fase={mod.fase} descricao={mod.descricao} />
+        <ModuleGate slug="auto-lancamento" />
       </>
     );
   }

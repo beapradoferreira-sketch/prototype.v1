@@ -11,23 +11,23 @@
 
 import Link from "next/link";
 import { useSession } from "@/components/session";
+import { ModuleGate } from "@/components/module-gate";
 import {
-  Badge, Callout, Card, ModuleDisabled, PageHeader, SectionTitle, Stat,
+  Badge, Callout, Card, PageHeader, SectionTitle, Stat,
   Table, Td, shortDate,
 } from "@/components/ui";
-import { CLIENTS, COMPETENCIA_ATUAL, DOCUMENTS, MODULES, getClient } from "@/lib/data";
+import { CLIENTS, COMPETENCIA_ATUAL, DOCUMENTS, getClient } from "@/lib/data";
 import { CANAL_LABEL } from "@/lib/labels";
 import { buildPortalView } from "@/lib/portal";
 
 export default function PortalPage() {
   const { modules } = useSession();
-  const mod = MODULES.find((m) => m.slug === "portal-cliente")!;
 
   if (!modules["portal-cliente"]) {
     return (
       <>
         <PageHeader title="Portal do cliente" note="Fase 3" />
-        <ModuleDisabled nome={mod.nome} fase={mod.fase} descricao={mod.descricao} />
+        <ModuleGate slug="portal-cliente" />
       </>
     );
   }

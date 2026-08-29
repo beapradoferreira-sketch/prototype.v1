@@ -56,6 +56,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
       <NavLink href="/lancamentos">Auto-lançamento</NavLink>
       <NavLink href="/agentes">Agentes</NavLink>
       <NavLink href="/portal">Portal do cliente</NavLink>
+      {/* Link direto: a visão do cliente só era alcançável por dentro do
+          /portal, o que a tornava invisível para quem não sabia que existia. */}
+      <NavLink href="/area-do-cliente">Área do cliente ↗</NavLink>
 
       {canAccessAdmin(viewer) && (
         <>

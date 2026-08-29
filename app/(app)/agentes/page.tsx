@@ -10,10 +10,11 @@
  */
 
 import { useSession } from "@/components/session";
+import { ModuleGate } from "@/components/module-gate";
 import {
-  Badge, Callout, Card, ModuleDisabled, PageHeader, SectionTitle, dateTime,
+  Badge, Callout, Card, PageHeader, SectionTitle, dateTime,
 } from "@/components/ui";
-import { FLAGS, MODULES } from "@/lib/data";
+import { FLAGS } from "@/lib/data";
 import type { AgentSlug } from "@/lib/types";
 import { SEVERIDADE_LABEL } from "@/lib/labels";
 
@@ -36,13 +37,12 @@ const PROCESSO = [
 
 export default function AgentesPage() {
   const { modules } = useSession();
-  const mod = MODULES.find((m) => m.slug === "agentes")!;
 
   if (!modules.agentes) {
     return (
       <>
         <PageHeader title="Agentes automatizados" note="Fase 3" />
-        <ModuleDisabled nome={mod.nome} fase={mod.fase} descricao={mod.descricao} />
+        <ModuleGate slug="agentes" />
       </>
     );
   }

@@ -13,10 +13,11 @@
 import Link from "next/link";
 import { use, useState } from "react";
 import { useSession } from "@/components/session";
+import { ModuleGate } from "@/components/module-gate";
 import {
-  Badge, Callout, Card, ModuleDisabled, Progress, SectionTitle, currency, shortDate,
+  Badge, Callout, Card, Progress, SectionTitle, currency, shortDate,
 } from "@/components/ui";
-import { CLIENTS, COMPETENCIAS, COMPETENCIA_ATUAL, FIRM, MODULES, getUser } from "@/lib/data";
+import { CLIENTS, COMPETENCIAS, COMPETENCIA_ATUAL, FIRM, getUser } from "@/lib/data";
 import { buildPortalView } from "@/lib/portal";
 import { formatCnpj } from "@/lib/cnpj";
 import { REGIME_LABEL } from "@/lib/labels";
@@ -39,14 +40,13 @@ export default function AreaDoClientePage({
   const [compId, setCompId] = useState(COMPETENCIA_ATUAL);
   const [pedidoEnviado, setPedidoEnviado] = useState<string | null>(null);
 
-  const mod = MODULES.find((m) => m.slug === "portal-cliente")!;
   const view = buildPortalView(clientId, compId);
   const encarregado = getUser(FIRM.encarregadoId);
 
   if (!modules["portal-cliente"]) {
     return (
       <div className="mx-auto max-w-3xl px-6 py-16">
-        <ModuleDisabled nome={mod.nome} fase={mod.fase} descricao={mod.descricao} />
+        <ModuleGate slug="portal-cliente" />
       </div>
     );
   }
